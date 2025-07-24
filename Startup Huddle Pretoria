@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Startup Huddle Insight Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .card-container {
+            perspective: 1000px;
+        }
+        
+        .card {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            backface-visibility: hidden;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        
+        .option-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .option-btn.correct {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-color: #059669;
+        }
+        
+        .option-btn.incorrect {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-color: #dc2626;
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- Header -->
+        <div class="text-center mb-8 fade-in">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Startup Huddle Pretoria Insight Challenge</h1>
+            <p class="text-lg text-gray-600">Test your entrepreneurial knowledge with interactive flashcards</p>
+        </div>
+        
+        <!-- Progress Section -->
+        <div class="mb-8 fade-in">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Progress</span>
+                <span class="text-sm font-medium text-gray-700" id="progress-text">Card 1 of 5</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="progress-bar bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full" id="progress-bar" style="width: 20%"></div>
+            </div>
+        </div>
+        
+        <!-- Score Display -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center bg-white rounded-full px-6 py-2 shadow-md">
+                <span class="text-lg font-semibold text-gray-700">Score: </span>
+                <span class="text-lg font-bold text-indigo-600 ml-2" id="score">0/0</span>
+            </div>
+        </div>
+        
+        <!-- Flashcard Container -->
+        <div class="card-container mb-8">
+            <div class="card relative w-full h-96 mx-auto" id="flashcard">
+                <!-- Front of Card -->
+                <div class="card-front bg-white rounded-xl shadow-lg p-8 border-2 border-gray-200">
+                    <div class="h-full flex flex-col">
+                        <div class="text-center mb-6">
+                            <div class="inline-block bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">
+                                Question
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col justify-center">
+                            <h2 class="text-xl font-semibold text-gray-800 mb-8 text-center leading-relaxed" id="question-text">
+                                What term describes the interconnected network of individuals, organizations, and resources that collectively support the development and growth of startups in a specific area?
+                            </h2>
+                            
+                            <div class="space-y-3" id="options-container">
+                                <button class="option-btn w-full p-4 text-left bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-lg font-medium text-gray-700" data-option="A">
+                                    A. Market Segmentation
+                                </button>
+                                <button class="option-btn w-full p-4 text-left bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-lg font-medium text-gray-700" data-option="B">
+                                    B. Entrepreneurial Ecosystem
+                                </button>
+                                <button class="option-btn w-full p-4 text-left bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-lg font-medium text-gray-700" data-option="C">
+                                    C. Business Incubator
+                                </button>
+                                <button class="option-btn w-full p-4 text-left bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-lg font-medium text-gray-700" data-option="D">
+                                    D. Financial Infrastructure
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed" id="reveal-btn" disabled>
+                                Select an answer first
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Back of Card -->
+                <div class="card-back bg-white rounded-xl shadow-lg p-8 border-2 border-gray-200">
+                    <div class="h-full flex flex-col">
+                        <div class="text-center mb-6">
+                            <div class="inline-block bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+                                Answer
+                            </div>
+                        </div>
+                        
+                        <div class="flex-1 flex flex-col justify-center text-center">
+                            <div class="mb-6" id="feedback">
+                                <div class="text-2xl mb-2" id="feedback-icon">✅</div>
+                                <div class="text-lg font-semibold" id="feedback-text">Correct!</div>
+                            </div>
+                            
+                            <h3 class="text-2xl font-bold text-gray-800 mb-4" id="correct-term">
+                                Entrepreneurial Ecosystem
+                            </h3>
+                            
+                            <p class="text-gray-600 leading-relaxed text-lg" id="definition">
+                                The network of individuals, organizations, and resources (like Startup Huddle, mentors, investors, universities) that interact to support the creation and growth of new businesses in a specific region.
+                            </p>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors" id="next-btn">
+                                Next Card →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Game Complete Screen -->
+        <div class="hidden text-center bg-white rounded-xl shadow-lg p-8 border-2 border-gray-200" id="complete-screen">
+            <div class="text-6xl mb-4">🎉</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Challenge Complete!</h2>
+            <p class="text-xl text-gray-600 mb-6">You've mastered the startup fundamentals!</p>
+            <div class="text-2xl font-bold text-indigo-600 mb-6" id="final-score">Final Score: 0/5</div>
+            <button class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-lg font-medium transition-colors" id="restart-btn">
+                🔄 Start Over
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const flashcards = [
+            {
+                question: "What term describes the interconnected network of individuals, organizations, and resources that collectively support the development and growth of startups in a specific area?",
+                options: [
+                    "A. Market Segmentation",
+                    "B. Entrepreneurial Ecosystem", 
+                    "C. Business Incubator",
+                    "D. Financial Infrastructure"
+                ],
+                correct: "B",
+                term: "Entrepreneurial Ecosystem",
+                definition: "The network of individuals, organizations, and resources (like Startup Huddle, mentors, investors, universities) that interact to support the creation and growth of new businesses in a specific region."
+            },
+            {
+                question: "Which term refers to the earliest functional version of a product designed to gather validated learning from customers with minimal development effort?",
+                options: [
+                    "A. Full-Scale Prototype",
+                    "B. Minimum Viable Product (MVP)",
+                    "C. Alpha Release", 
+                    "D. Final Product Launch"
+                ],
+                correct: "B",
+                term: "Minimum Viable Product (MVP)",
+                definition: "The version of a new product which allows a team to collect the maximum amount of validated learning about customers with the least effort, typically used to test a core hypothesis."
+            },
+            {
+                question: "When a startup changes a fundamental element of its business model or product strategy after learning that initial assumptions were flawed, what is this strategic shift called?",
+                options: [
+                    "A. Iteration",
+                    "B. Scaling Up",
+                    "C. Pivot",
+                    "D. Diversification"
+                ],
+                correct: "C", 
+                term: "Pivot",
+                definition: "A structured course correction designed to test a new fundamental hypothesis about a startup's product, strategy, or growth engine, often made after initial assumptions prove incorrect."
+            },
+            {
+                question: "What is the process of directly engaging with potential users to confirm if your product or service truly addresses their problems and fulfills their needs?",
+                options: [
+                    "A. Market Research",
+                    "B. Product Development", 
+                    "C. Customer Validation",
+                    "D. Sales Forecasting"
+                ],
+                correct: "C",
+                term: "Customer Validation", 
+                definition: "The process of testing whether a specific product or service genuinely meets customer needs and solves their problems, often through direct engagement and feedback."
+            },
+            {
+                question: "What term describes the act of building and growing a business primarily using personal savings, current revenues, or other non-external funding sources?",
+                options: [
+                    "A. Venture Capital Funding",
+                    "B. Equity Financing",
+                    "C. Bootstrapping", 
+                    "D. Crowdfunding Campaign"
+                ],
+                correct: "C",
+                term: "Bootstrapping",
+                definition: "The process of building and growing a business primarily using personal savings, current revenues, or other non-external funding sources, without relying on external investors."
+            }
+        ];
+
+        let currentCard = 0;
+        let score = 0;
+        let selectedOption = null;
+        let answered = false;
+
+        const elements = {
+            card: document.getElementById('flashcard'),
+            questionText: document.getElementById('question-text'),
+            optionsContainer: document.getElementById('options-container'),
+            revealBtn: document.getElementById('reveal-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            correctTerm: document.getElementById('correct-term'),
+            definition: document.getElementById('definition'),
+            feedbackIcon: document.getElementById('feedback-icon'),
+            feedbackText: document.getElementById('feedback-text'),
+            progressText: document.getElementById('progress-text'),
+            progressBar: document.getElementById('progress-bar'),
+            scoreDisplay: document.getElementById('score'),
+            completeScreen: document.getElementById('complete-screen'),
+            finalScore: document.getElementById('final-score'),
+            restartBtn: document.getElementById('restart-btn')
+        };
+
+        function loadCard() {
+            const card = flashcards[currentCard];
+            answered = false;
+            selectedOption = null;
+            
+            // Reset card to front
+            elements.card.classList.remove('flipped');
+            
+            // Update question and options
+            elements.questionText.textContent = card.question;
+            
+            const optionButtons = elements.optionsContainer.querySelectorAll('.option-btn');
+            optionButtons.forEach((btn, index) => {
+                btn.textContent = card.options[index];
+                btn.className = 'option-btn w-full p-4 text-left bg-gray-50 hover:bg-gray-100 border-2 border-gray-200 rounded-lg font-medium text-gray-700';
+                btn.disabled = false;
+            });
+            
+            // Update back content
+            elements.correctTerm.textContent = card.term;
+            elements.definition.textContent = card.definition;
+            
+            // Reset reveal button
+            elements.revealBtn.textContent = 'Select an answer first';
+            elements.revealBtn.disabled = true;
+            
+            // Update progress
+            elements.progressText.textContent = `Card ${currentCard + 1} of ${flashcards.length}`;
+            elements.progressBar.style.width = `${((currentCard + 1) / flashcards.length) * 100}%`;
+            elements.scoreDisplay.textContent = `${score}/${currentCard}`;
+        }
+
+        function selectOption(option) {
+            if (answered) return;
+            
+            selectedOption = option;
+            
+            // Update button states
+            const optionButtons = elements.optionsContainer.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => {
+                btn.classList.remove('bg-blue-100', 'border-blue-300');
+                if (btn.dataset.option === option) {
+                    btn.classList.add('bg-blue-100', 'border-blue-300');
+                }
+            });
+            
+            // Enable reveal button
+            elements.revealBtn.textContent = 'Reveal Answer';
+            elements.revealBtn.disabled = false;
+        }
+
+        function revealAnswer() {
+            if (!selectedOption || answered) return;
+            
+            answered = true;
+            const card = flashcards[currentCard];
+            const isCorrect = selectedOption === card.correct;
+            
+            if (isCorrect) {
+                score++;
+            }
+            
+            // Update option button colors
+            const optionButtons = elements.optionsContainer.querySelectorAll('.option-btn');
+            optionButtons.forEach(btn => {
+                btn.disabled = true;
+                if (btn.dataset.option === card.correct) {
+                    btn.className = 'option-btn correct w-full p-4 text-left border-2 rounded-lg font-medium';
+                } else if (btn.dataset.option === selectedOption && !isCorrect) {
+                    btn.className = 'option-btn incorrect w-full p-4 text-left border-2 rounded-lg font-medium';
+                }
+            });
+            
+            // Update feedback
+            elements.feedbackIcon.textContent = isCorrect ? '✅' : '❌';
+            elements.feedbackText.textContent = isCorrect ? 'Correct!' : 'Incorrect';
+            elements.feedbackText.className = isCorrect ? 'text-lg font-semibold text-green-600' : 'text-lg font-semibold text-red-600';
+            
+            // Flip card after short delay
+            setTimeout(() => {
+                elements.card.classList.add('flipped');
+            }, 500);
+        }
+
+        function nextCard() {
+            currentCard++;
+            
+            if (currentCard >= flashcards.length) {
+                showComplete();
+            } else {
+                loadCard();
+            }
+        }
+
+        function showComplete() {
+            elements.card.parentElement.style.display = 'none';
+            elements.completeScreen.classList.remove('hidden');
+            elements.finalScore.textContent = `Final Score: ${score}/${flashcards.length}`;
+            elements.scoreDisplay.textContent = `${score}/${flashcards.length}`;
+        }
+
+        function restart() {
+            currentCard = 0;
+            score = 0;
+            elements.card.parentElement.style.display = 'block';
+            elements.completeScreen.classList.add('hidden');
+            loadCard();
+        }
+
+        // Event listeners
+        elements.optionsContainer.addEventListener('click', (e) => {
+            if (e.target.classList.contains('option-btn')) {
+                selectOption(e.target.dataset.option);
+            }
+        });
+
+        elements.revealBtn.addEventListener('click', revealAnswer);
+        elements.nextBtn.addEventListener('click', nextCard);
+        elements.restartBtn.addEventListener('click', restart);
+
+        // Initialize game
+        loadCard();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96464742267cb910',t:'MTc1MzM5MDEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
